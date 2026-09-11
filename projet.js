@@ -183,6 +183,10 @@ const trips = [
         availableSeats: 50
     }
 ];
+let nextTicketId = 1 ;
+let tickets = [] ;
+
+
 function AfficherMenu(){
     console.log("=================")
     console.log("RAILWAY MANAGER")
@@ -194,6 +198,8 @@ function AfficherMenu(){
     console.log("5. Rechercher un ticket")
     console.log("6. Filtrer les trajets")
     console.log("7. Trier les trajets")
+    console.log("8. Afficher nombre total des tickets")
+    console.log("9. Afficher chiffre d'affaires")
     console.log("0. Quitter")
 }  
 function SelectionChoix(choix){
@@ -229,26 +235,90 @@ switch(choix){
 }  
 function AfficherTrajets(){
     console.log("===TRAJETS DISPONIBLES===")
-    for(i=0;i<trips.lenght;i++){
-         console.log("=== TRAJETS DISPONIBLES ===")
-         console.log("#",trips[i].id,trips[i].departure,"=>",trips[i].destination)
-         console.log("Départ :",trips[i].departureTime)
-         console.log("Arrivée :",trips[i].arrivalTime)
-         console.log("prix :",trips[i].price)
-         console.log("places disponibles :",trips[i].availableSeats)
+    for(i=0;i<trips.length;i++){
+         console.log("===  ===")
+         console.log("#",trips[i].id+trips[i].departure+"=>"+trips[i].destination)
+         console.log("Départ :"+trips[i].departureTime)
+         console.log("Arrivée :"+trips[i].arrivalTime)
+         console.log("prix :"+trips[i].price)
+         console.log("places disponibles :"+trips[i].availableSeats)
     }
 
 }
-function AcheterTicket(){}
-function AfficherTickets(){
-    console.log("====TICKETS====")
-    console.log("Ticket#")
+function place(identifiant){
+    let placeIndispo = [];
+    if(tickets.length == 0 ){
+        return 1 ;
+    }    
+    for(i=0;i<tickets.length;i++){
+        if(tickets[i].tripId == identifiant){
+            placeIndispo.push(tickets[i].seatNumber)
+        }
+    }
+    for(i=1;i<50;i++){
+        if(!placeIndispo.includes(i)){
+            return i ;
+            
+        }    
+        }
+    
 }
-let tickets = [] ;
+function AcheterTicket(){
+   nom = prompt("Entrer votre nom: ") ;
+   identifiant = prompt("entrer votre identifiant du trajet:  ") ;
+   trajet = trips.find((ele)=>ele.id==identifiant)
+   if(trajet == undefined){
+    console.log("trajet introuvable")   
+   }
+   if(trajet.availableSeats == 0){
+    console.log("Train complet")
+   }
+   if(trajet){
+    seatNumber= place(identifiant) ; 
+   let ticket = { id : nextTicketId ,
+                  passengerName : nom  ,
+                  tripId : trajet.id ,
+                  seatNumber : seatNumber ,
+                  price : trajet.price
+                  
+   }
+   trajet.seatNumber--;
+   nextTicketId++;
+   tickets.push(ticket)
+   console.log("Ticket acheté avec succès.")
+   console.log("Ticket: ",ticket.id)
+   console.log("Passager: ",ticket.passengerName)
+   console.log("Trajet: ",trajet.departure,"=>",trajet.destination)
+   console.log("Place: ",ticket.seatNumber)
+   console.log("Price: ",ticket.price)
+
+}
+ 
+}
+function AfficherTickets(){
+    if(tickets.length==0){
+        console.log("aucun ticket est disponible")
+        return;
+    }
+    console.log("====TICKETs====")
+    for(let i=0;i<tickets.length;i++){
+     console.log("========")
+     console.log("Ticket # ",tickets[i].id)
+     console.log("passager",tickets[i].passengerName)
+     let trajet = trips.find((ele)=>ele.id == tickets[i].tripId)
+     console.log("trajet :" ,trajet.departure, "=>", trajet.destination)
+     console.log("place :", tickets[i].seatNumber)
+     console.log("prix :", tickets[i].price)
+    }
+   
+}
+
 function AnnulerTicket(){
-    identifiant = prompt("entrer votre identifiant du ticket ") ;
+    identifiant = Number(prompt("entrer votre identifiant du ticket ")) ;
     for(i=0;i<tickets.length;i++){
         if(tickets[i].id == identifiant){
+            trajet = trips.find((trajet)=> trajet.id==tickets[i].tripId)
+            trajet.availableSeats++
             tickets.splice(i,1)
         }
     }
@@ -256,9 +326,9 @@ function AnnulerTicket(){
 }
 function RechercherTicket(){
     nom = prompt("entrer votre nom");
-    for(i=0;i<tickets.lenght;i++){
+    for(i=0;i<tickets.length;i++){
     if(tickets[i].passengerName == nom ){
-    let trajet = trips.find(tj=>tj.id == tickets.tripsId) 
+    let trajet = trips.find(tj=>tj.id == tickets[i].tripId) 
     console.log("ticket #",tickets[i].id) 
     console.log("passager:",tickets[i].passengerName) 
     console.log("trajet :",trajet.departure,"==>",trajet.destination) 
@@ -267,11 +337,83 @@ function RechercherTicket(){
     }    
     }
 }
-function FiltrerTrajets(){}
-function TrierTrajets(){}
+function FiltrerTrajets(){
+    ville = prompt("entrer votre ville de depart ")
+    for(i=0;i<trips.length;i++){
+        if(trips[i].departure==ville){
+            console.log(trips[i].departure,"=>",trips[i].destination,":",trips[i].price,"DH")
+        }
+       
+        
+    }
+}
+function TrierTrajets(){
+    for(i=0;i<trips.length;i++){
+        for(j=0;j<trips.length-1-i;j++){
+            if(trips[j].price>trips[j+1].price){
+                let temp = trips[j] ;
+                trips[j] = trips[j+1]
+                trips[j+1] = temp 
+            }
+        }
+    }
+    for(i=0;i<trips.length;i++){
+        console.log(trips[i].departure , "=>" ,trips[i].destination,":",trips[i].price,"DH")
+    }
+}
+function NombreTotalTickets(){
+    let nombreTotalTickets = tickets.length ;
+    console.log("Nombre total de tickets :" , nombreTotalTickets)
+}
+function ChiffreAffaires(){
+    let somme = 0 ;
+    for(i=0;i<tickets.length;i++){
+        somme = somme + tickets[i].price
+    }
+    console.log("Chiffre d'affaires total :" , somme)
+}
+
 do{
     AfficherMenu()
     choix = Number(prompt("entrer votre choix ")) ;
-    SelectionChoix(choix)
+
+    switch(choix){
+        case 1 :
+            AfficherTrajets()
+            break;
+        
+        case 2 : 
+            AcheterTicket()
+            break;
+        
+        case 3 :
+            AfficherTickets()
+            break;
+        
+        case 4 :
+             AnnulerTicket()
+            break;
+        
+        case 5 : 
+            RechercherTicket()
+            break;
+        
+        case 6 : 
+            FiltrerTrajets()
+            break;
+        
+        case 7 :
+            TrierTrajets()
+            break;
+        case 8 :
+            NombreTotalTickets()
+            break;
+        case 9 :
+            ChiffreAffaires() 
+            break;       
+        } 
+
             
 } while (choix !== 0)
+
+
