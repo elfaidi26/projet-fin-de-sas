@@ -267,20 +267,18 @@ function AcheterTicket(){
    nom = prompt("Entrer votre nom: ") ;
    identifiant = prompt("entrer votre identifiant du trajet:  ") ;
    trajet = trips.find((ele)=>ele.id==identifiant)
-   if(trajet == undefined){
+   if(!trajet ){
     console.log("trajet introuvable")   
-   }
+   }else{
    if(trajet.availableSeats == 0){
     console.log("Train complet")
-   }
-   if(trajet){
-    seatNumber= place(identifiant) ; 
+   }else{
+seatNumber= place(identifiant) ; 
    let ticket = { id : nextTicketId ,
                   passengerName : nom  ,
                   tripId : trajet.id ,
                   seatNumber : seatNumber ,
                   price : trajet.price
-                  
    }
    trajet.seatNumber--;
    nextTicketId++;
@@ -294,6 +292,7 @@ function AcheterTicket(){
 
 }
  
+}
 }
 function AfficherTickets(){
     if(tickets.length==0){
@@ -325,7 +324,7 @@ function AnnulerTicket(){
 
 }
 function RechercherTicket(){
-    nom = prompt("entrer votre nom");
+    nom = prompt("entrer votre nom ");
     for(i=0;i<tickets.length;i++){
     if(tickets[i].passengerName == nom ){
     let trajet = trips.find(tj=>tj.id == tickets[i].tripId) 
